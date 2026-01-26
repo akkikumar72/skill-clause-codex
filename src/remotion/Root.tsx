@@ -1,37 +1,43 @@
 import { Composition } from "remotion";
-import { Main } from "./MyComp/Main";
-import {
-  COMP_NAME,
-  defaultMyCompProps,
-  DURATION_IN_FRAMES,
-  VIDEO_FPS,
-  VIDEO_HEIGHT,
-  VIDEO_WIDTH,
-} from "../../types/constants";
-import { NextLogo } from "./MyComp/NextLogo";
+import { TerminalPrompt } from "./TerminalPrompt";
+import { TerminalMaster } from "./TerminalMaster";
+import { SkillsLogos } from "./SkillsLogos";
+import { DrilldownRemoval } from "./animations/drilldown-removal/DrilldownRemoval";
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
       <Composition
-        id={COMP_NAME}
-        component={Main}
-        durationInFrames={DURATION_IN_FRAMES}
-        fps={VIDEO_FPS}
-        width={VIDEO_WIDTH}
-        height={VIDEO_HEIGHT}
-        defaultProps={defaultMyCompProps}
+        id="TerminalPrompt"
+        component={TerminalPrompt}
+        durationInFrames={180}
+        fps={30}
+        width={1280}
+        height={700}
       />
       <Composition
-        id="NextLogo"
-        component={NextLogo}
-        durationInFrames={300}
+        id="TerminalMaster"
+        component={TerminalMaster}
+        durationInFrames={240}
         fps={30}
-        width={140}
-        height={140}
-        defaultProps={{
-          outProgress: 0,
-        }}
+        width={1280}
+        height={700}
+      />
+      <Composition
+        id="SkillsLogos"
+        component={SkillsLogos}
+        durationInFrames={180}
+        fps={30}
+        width={1280}
+        height={700}
+      />
+      <Composition
+        id="DrilldownRemoval"
+        component={DrilldownRemoval}
+        durationInFrames={150}
+        fps={30}
+        width={1280}
+        height={720}
       />
     </>
   );

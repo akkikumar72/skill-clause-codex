@@ -12,6 +12,7 @@
     "@remotion/cli": "4.0.407",
     "@remotion/google-fonts": "4.0.407",
     "@remotion/lambda": "4.0.407",
+    "@remotion/media": "4.0.407",
     "@remotion/paths": "4.0.407",
     "@remotion/player": "4.0.407",
     "@remotion/shapes": "4.0.407",
