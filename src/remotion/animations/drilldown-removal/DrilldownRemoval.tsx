@@ -304,172 +304,6 @@ const StackedBarChart = ({
   );
 };
 
-const WaveformChart = ({
-  localFrame,
-  fps,
-}: {
-  localFrame: number;
-  fps: number;
-}) => {
-  const values = [0.3, 0.6, 0.4, 0.8, 0.55, 0.9, 0.5, 0.7, 0.35];
-  const path = values
-    .map((value, index) => {
-      const x = (index / (values.length - 1)) * 100;
-      const y = 100 - value * 100;
-      return `${index === 0 ? "M" : "L"} ${x} ${y}`;
-    })
-    .join(" ");
-  const drawProgress = interpolate(localFrame, [0, fps * 1.5], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
-  return (
-    <div style={{ width: "100%", height: "100%", padding: "10px" }}>
-      <svg
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-        style={{ width: "100%", height: "100%" }}
-      >
-        <path
-          d={path}
-          fill="none"
-          stroke="rgba(94, 255, 198, 0.25)"
-          strokeWidth={6}
-          strokeLinecap="round"
-        />
-        <path
-          d={path}
-          fill="none"
-          stroke="#5ff0c2"
-          strokeWidth={3}
-          strokeLinecap="round"
-          pathLength={1}
-          strokeDasharray={1}
-          strokeDashoffset={1 - drawProgress}
-        />
-      </svg>
-    </div>
-  );
-};
-
-const AlertingGraph = ({
-  localFrame,
-  fps,
-}: {
-  localFrame: number;
-  fps: number;
-}) => {
-  const reveal = interpolate(localFrame, [0, fps * 2.0], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const hoverWave = (Math.sin((localFrame / (fps * 4)) * Math.PI * 2) + 1) / 2;
-  const hoverX = 12 + hoverWave * 196;
-  const pulse = (Math.sin((localFrame / (fps * 2.8)) * Math.PI * 2) + 1) / 2;
-
-  const primary = [0.2, 0.24, 0.22, 0.35, 0.52, 0.58, 0.38, 0.46, 0.62, 0.56, 0.48, 0.7];
-  const secondary = [0.14, 0.18, 0.16, 0.2, 0.26, 0.3, 0.24, 0.28, 0.32, 0.3, 0.27, 0.29];
-  const width = 220;
-  const height = 120;
-  const paddingX = 12;
-  const paddingY = 16;
-  const usableWidth = width - paddingX * 2;
-  const usableHeight = height - paddingY * 2;
-
-  const toPath = (values: number[]) =>
-    values
-      .map((value, index) => {
-        const x = paddingX + (index / (values.length - 1)) * usableWidth;
-        const y = paddingY + (1 - value) * usableHeight;
-        return `${index === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
-      })
-      .join(" ");
-
-  const primaryPath = toPath(primary);
-  const secondaryPath = toPath(secondary);
-
-  const hoverValueIndex = Math.max(
-    0,
-    Math.min(primary.length - 2, Math.floor(((hoverX - paddingX) / usableWidth) * (primary.length - 1)))
-  );
-  const hoverT =
-    ((hoverX - paddingX) / usableWidth) * (primary.length - 1) - hoverValueIndex;
-  const hoverValue =
-    primary[hoverValueIndex] * (1 - hoverT) + primary[hoverValueIndex + 1] * hoverT;
-  const hoverY = paddingY + (1 - hoverValue) * usableHeight;
-
-  const clipId = "alerting-clip";
-  const gradientId = "alerting-gradient";
-
-  return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        borderRadius: 12,
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "100%" }}>
-        <defs>
-          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#5bd17a" />
-            <stop offset="55%" stopColor="#ffb347" />
-            <stop offset="100%" stopColor="#ff5b6b" />
-          </linearGradient>
-          <clipPath id={clipId}>
-            <rect x="0" y="0" width={width * reveal} height={height} />
-          </clipPath>
-        </defs>
-        <rect x="0" y="0" width={width} height={height} fill="#11161c" />
-        <rect x="0" y="0" width={width} height={height} fill="rgba(255,255,255,0.02)" />
-        <rect x="0" y={paddingY + usableHeight * 0.15} width={width} height={usableHeight * 0.2} fill="rgba(95,208,142,0.08)" />
-        <rect x="0" y={paddingY + usableHeight * 0.45} width={width} height={usableHeight * 0.2} fill="rgba(255,179,71,0.08)" />
-        <rect x="0" y={paddingY + usableHeight * 0.7} width={width} height={usableHeight * 0.2} fill="rgba(255,91,107,0.08)" />
-        <g clipPath={`url(#${clipId})`}>
-          <path
-            d={`${primaryPath} L ${width - paddingX} ${height - paddingY} L ${paddingX} ${height - paddingY} Z`}
-            fill="rgba(87,148,242,0.12)"
-          />
-          <path
-            d={secondaryPath}
-            fill="none"
-            stroke="rgba(255,255,255,0.25)"
-            strokeWidth={2}
-            strokeLinecap="round"
-          />
-          <path
-            d={primaryPath}
-            fill="none"
-            stroke={`url(#${gradientId})`}
-            strokeWidth={3}
-            strokeLinecap="round"
-            style={{ filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.35))" }}
-          />
-          <line
-            x1={hoverX}
-            y1={paddingY}
-            x2={hoverX}
-            y2={height - paddingY}
-            stroke="rgba(255,255,255,0.2)"
-            strokeWidth={1}
-          />
-          <circle
-            cx={hoverX}
-            cy={hoverY}
-            r={4 + pulse * 1.5}
-            fill="#ff5b6b"
-            stroke="rgba(255,255,255,0.7)"
-            strokeWidth={1}
-          />
-        </g>
-      </svg>
-    </div>
-  );
-};
-
 const CandlestickGraph = ({
   localFrame,
   fps,
@@ -582,43 +416,6 @@ const CandlestickGraph = ({
           );
         })}
       </svg>
-    </div>
-  );
-};
-
-const StatDisplay = ({
-  localFrame,
-  fps,
-}: {
-  localFrame: number;
-  fps: number;
-}) => {
-  const raw = interpolate(localFrame, [0, fps * 1.2], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const eased = interpolate(raw, [0, 0.7, 1], [0, 0.9, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const leftValue = interpolate(eased, [0, 1], [0, 83.18]);
-  const rightValue = interpolate(eased, [0, 1], [0, 32.52]);
-
-  return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-evenly",
-        fontWeight: 600,
-        fontSize: 36,
-        letterSpacing: 0.5,
-      }}
-    >
-      <span style={{ color: "#ff6ea9" }}>{leftValue.toFixed(2)}</span>
-      <span style={{ color: "#64b5ff" }}>{rightValue.toFixed(2)}</span>
     </div>
   );
 };
@@ -963,7 +760,7 @@ export const DrilldownRemoval: React.FC = () => {
       />
 
       <div style={{ opacity: contentOpacity }}>
-        <Sequence from={0}>
+        <Sequence>
           <WidgetCard
             x={20}
             y={60}
@@ -985,7 +782,7 @@ export const DrilldownRemoval: React.FC = () => {
             )}
           />
         </Sequence>
-        <Sequence from={0}>
+        <Sequence>
           <WidgetCard
             x={1260}
             y={60}
@@ -1003,7 +800,7 @@ export const DrilldownRemoval: React.FC = () => {
             )}
           />
         </Sequence>
-        <Sequence from={0}>
+        <Sequence>
           <WidgetCard
             x={40}
             y={330}
@@ -1018,7 +815,7 @@ export const DrilldownRemoval: React.FC = () => {
             alwaysVisible
           />
         </Sequence>
-        <Sequence from={0}>
+        <Sequence>
           <WidgetCard
             x={gaugeX}
             y={330}
@@ -1036,7 +833,7 @@ export const DrilldownRemoval: React.FC = () => {
             )}
           />
         </Sequence>
-        <Sequence from={0}>
+        <Sequence>
         <WidgetCard
           x={150}
           y={670}
@@ -1054,7 +851,7 @@ export const DrilldownRemoval: React.FC = () => {
           )}
         />
       </Sequence>
-      <Sequence from={0}>
+      <Sequence>
         <WidgetCard
           x={1130}
           y={670}
@@ -1074,7 +871,7 @@ export const DrilldownRemoval: React.FC = () => {
       </Sequence>
       </div>
 
-      <Sequence from={0}>
+      <Sequence>
         <div
           style={{
             position: "absolute",

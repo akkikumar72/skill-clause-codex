@@ -2,11 +2,7 @@
   "name": "skill-clause-codex",
   "version": "0.1.0",
   "private": true,
-  "author": {
-    "name": "Mohit Yadav",
-    "email": "mohit@mohitya.dev",
-    "url": "https://mohitya.dev"
-  },
+
   "dependencies": {
     "@remotion/bundler": "4.0.407",
     "@remotion/cli": "4.0.407",

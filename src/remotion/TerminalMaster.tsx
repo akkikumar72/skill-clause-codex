@@ -89,7 +89,6 @@ export const TerminalMaster = () => {
         <SkillsReveal />
       </Sequence>
       <Sequence
-        from={0}
         style={{
           width: "100%",
           height: "100%",
